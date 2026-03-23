@@ -1,0 +1,1218 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/16327/TweenMax-latest-beta.js"></script>
+<script src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/16327/Draggable-latest-beta.js?r=5"></script>
+<style>
+body{
+  font-family: Arial;
+  text-align:center;
+  background: radial-gradient(circle at top,#1e1e1e,#0d0d0d);
+  color:white;
+  margin:0;
+  padding:5px 20px;
+}
+.main-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+/* New section styles */
+.steering-section, .movement-section, .lights-section {
+   background: rgba(255,255,255,0.06);
+  border-radius:24px;
+  padding:20px;
+  width: 100%;
+  max-width: 350px;
+
+  backdrop-filter: blur(14px);
+
+  border:1px solid rgba(255,255,255,0.08);
+
+  box-shadow:
+    0 15px 40px rgba(0,0,0,0.6),
+    inset 0 1px 0 rgba(255,255,255,0.08);
+
+  transition: all .3s ease;
+  
+}
+
+.steering-section,
+.movement-section,
+.lights-section{
+
+  background: linear-gradient(
+    145deg,
+    rgba(40,40,40,0.9),
+    rgba(20,20,20,0.9)
+  );
+
+  border-radius:28px;
+
+  border:1px solid rgba(255,255,255,0.08);
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.08),
+    0 25px 50px rgba(0,0,0,0.7),
+    0 0 25px rgba(0,0,0,0.4);
+
+}
+
+.steering-section:hover,
+.movement-section:hover,
+.lights-section:hover{
+  transform: translateY(-5px);
+  box-shadow:
+    0 25px 50px rgba(0,0,0,0.8),
+    0 0 20px rgba(156,39,176,0.4);
+}
+
+.lights-section{
+
+position:absolute;
+right:10px;
+top:100px;
+
+display:flex;
+flex-direction:column;
+gap:10px;
+
+background:rgba(0,0,0,.3);
+padding:10px;
+border-radius:20px;
+
+backdrop-filter:blur(10px);
+
+}
+/* Movement arrows styles */
+.movement-arrows {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  margin: 20px 0;
+}
+
+/* Combined controls layout */
+.combined-controls {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  gap: 30px;
+  margin: 20px 0;
+}
+
+.status-info {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  margin: 15px 0;
+  gap: 20px;
+}
+
+.status-info h3 {
+  margin: 0;
+  font-size: 16px;
+}
+
+/* Movement and Lights Controls */
+.two-column-layout {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  padding: 20px 0;
+  
+}
+
+/* Section A: Steering (Top) + Movement + Speed (Bottom) */
+.section-a {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.steering-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.movement-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.movement-speed-grid {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+  
+}
+
+.status-info {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  margin: 15px 0;
+  gap: 20px;
+}
+
+.status-info h4 {
+  margin: 0;
+  font-size: 14px;
+  color: #ccc;
+}
+
+/* Section B: Lights (Vertical Top to Bottom) */
+.section-b {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 50px;
+}
+
+.lights-vertical {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 50px;
+}
+
+.rgb-separator {
+  height: 1px;
+  background: rgba(255,255,255,0.2);
+  margin: 8px 0;
+  width: 100%;
+}
+
+/* Vertical Light Buttons */
+.light-btn.vertical, .rgb-btn.vertical {
+  width: 50px;
+  height: 40px;
+  font-size: 10px;
+  padding: 4px 2px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  border-radius: 8px;
+}
+
+.light-btn.vertical i, .rgb-btn.vertical i {
+  font-size: 12px;
+  margin-bottom: 1px;
+}
+
+.rgb-btn.vertical {
+  height: 45px;
+  font-size: 9px;
+  padding: 3px 1px;
+}
+
+.column-title {
+  color: #9C27B0;
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  
+}
+
+.arrow-btn {
+  width: 75px;
+  height: 75px;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  user-select: none;
+  font-size: 24px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+.arrow-btn:active {
+  transform: scale(0.9);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+.arrow-btn.up {
+  background: #4CAF50;
+  color: white;
+}
+
+.arrow-btn.down {
+  background: #f44336;
+  color: white;
+}
+
+.arrow-btn.stop {
+  background: #FF9800;
+  color: white;
+}
+
+.remote-section {
+  flex: 1;
+}
+
+.speed-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.lights-section {
+  flex: 1.5;
+}
+
+.remote {
+  background: #2d2d2d;
+  border-radius: 50%;
+  width: 300px;
+  height: 300px;
+  margin: 0 auto;
+  position: relative;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.btn {
+  position: absolute;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  user-select: none;
+  font-size: 20px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+.btn:active {
+  transform: scale(0.9);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+.forward {
+  background: #4CAF50;
+  color: white;
+  width: 70px;
+  height: 70px;
+  top: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.backward {
+  background: #f44336;
+  color: white;
+  width: 70px;
+  height: 70px;
+  bottom: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+
+.stop {
+  background: #9E9E9E;
+  color: white;
+}
+
+.steer-control {
+  
+  border-radius: 20px;
+  padding: 15px;
+  margin-top: 20px;
+  position: relative;
+}
+
+.steer-mode-toggle {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.mode-btn {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 15px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.mode-btn.active {
+  background: #4CAF50;
+  color: white;
+}
+
+.mode-btn:not(.active) {
+  background: #666;
+  color: white;
+}
+
+.orientation-info {
+  text-align: center;
+  color: #ccc;
+  margin-top: 15px;
+  font-size: 14px;
+}
+
+.test-btn {
+  padding: 6px 12px;
+  background: #ff9800;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 12px;
+  margin: 10px 0;
+  cursor: pointer;
+}
+
+.steer-wheel {
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  
+background:
+radial-gradient(circle at center,
+#9C27B0 0%,
+#4a148c 60%,
+#1a0a2a 100%);
+
+box-shadow:
+0 0 40px rgba(156,39,176,.6),
+inset 0 0 30px rgba(0,0,0,.8);
+  border: 3px solid #fff;
+  position: relative;
+  cursor: grab;
+  user-select: none;
+  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+}
+
+.steer-wheel:active {
+  cursor: grabbing;
+}
+
+.steer-wheel img {
+  width: 240px;
+  height: 240px;
+  transition: transform 0.3s ease-out;
+  /* Smooth transition for steering movements */
+}
+
+.steer-wheel img{
+  filter: drop-shadow(0 0 20px rgba(156,39,176,.7));
+}
+
+.arrow-btn{
+
+  border:none;
+
+  box-shadow:
+    0 5px 20px rgba(0,0,0,.6),
+    inset 0 2px 4px rgba(255,255,255,.2);
+
+  transition: all .2s ease;
+}
+
+.arrow-btn:hover{
+  transform:scale(1.05);
+  box-shadow:
+    0 0 15px rgba(255,255,255,.5);
+}
+.arrow-btn:active{
+
+transform:scale(.92);
+
+box-shadow:
+inset 0 4px 10px rgba(0,0,0,.6);
+
+}
+
+.rgb-btn{
+  background:#E91E63;
+
+  box-shadow:
+    0 0 12px rgba(233,30,99,.7);
+
+  transition:.2s;
+}
+
+.rgb-btn:hover{
+  transform:scale(1.08);
+  box-shadow:
+    0 0 18px rgba(233,30,99,1);
+}
+
+.slider-vertical{
+background: linear-gradient(
+to top,
+#ff3d00,
+#ff9800,
+#4caf50
+);
+
+box-shadow:
+0 0 20px rgba(255,120,0,.6);
+
+
+  border-radius:30px;
+}
+.speed-control {
+  width: 50px;
+  height: 250px;
+  background: #333;
+  border-radius: 30px;
+  padding: 8px;
+  position: relative;
+}
+
+.slider-vertical {
+  writing-mode: bt-lr;
+  -webkit-appearance: slider-vertical;
+  width: 34px;
+  height: 240px;
+  background: #ddd;
+  outline: none;
+  border-radius: 20px;
+}
+
+.slider-vertical::-webkit-slider-thumb{
+
+  background:#fff;
+
+  width:22px;
+  height:22px;
+
+  border-radius:50%;
+
+  box-shadow:
+    0 0 10px rgba(255,255,255,.8);
+}
+
+.lights {
+  display: flex;
+  flex-direction: row;
+  gap: 15px;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.light-btn {
+  background: #FFC107;
+  color: white;
+  padding: 12px 15px;
+  border-radius: 20px;
+  font-size: 14px;
+  width: 85px;
+}
+
+.rgb-btn {
+  background: #E91E63;
+  color: white;
+  padding: 10px 12px;
+  border-radius: 15px;
+  font-size: 12px;
+  width: 85px;
+}
+
+.status {
+  background: #333;
+  border-radius: 10px;
+  padding: 15px;
+  margin: 20px auto;
+  max-width: 300px;
+}
+
+h2 {
+  margin-bottom: 20px;
+}
+
+h3 {
+  margin: 0;
+}
+
+.section-title {
+  color: #4CAF50;
+  font-size: 18px;
+  
+}
+
+.text-purple-400 {
+  color: #9C27B0;
+}
+
+.text-yellow-400 {
+  color: #FFC107;
+}
+
+.text-green-400 {
+  color: #4CAF50;
+}
+
+.text-blue-400 {
+  color: #2196F3;
+}
+</style>
+</head>
+<body>
+
+<div class="main-container">
+  <!-- First Section: Steering Control (Now Empty - Will be Removed) -->
+
+  <!-- Second Section: Movement & Lights Control -->
+  <div class="movement-section">
+    <!-- Status Display at Top of Movement Section -->
+    <div class="status-top">
+      <h3><span id="direction" class="text-green-400">🛑 Stopped</span>        <span id="speed-display" class="text-yellow-400">160 km/h</span></h3>
+    </div>
+    
+    
+    <div class="two-column-layout">
+      <!-- Section A: Steering (Top) + Movement + Speed (Bottom) -->
+      <div class="section-a">
+        <!-- Steering Controls -->
+        <div class="steering-controls">          
+          <div class="steer-wheel">
+            <img id="wheel"
+            src="https://www.pngall.com/wp-content/uploads/5/Car-Steering-Wheel-PNG-Images.png"
+            alt="steering wheel">
+          </div>
+          <!-- Tilt Mode Toggle Button -->
+          <button id="tiltToggle" onclick="toggleTiltMode()" style="margin-top: 10px; padding: 8px 16px; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer;">
+            Enable Tilt Mode
+          </button>
+        </div>
+        
+        <!-- Movement Controls -->
+        <div class="movement-controls">
+          
+          <div class="movement-speed-grid">
+            <div class="movement-arrows">
+              <button class="arrow-btn up" onclick="send('F')"><i class="fas fa-arrow-up"></i></button>
+              <button class="arrow-btn stop" onclick="send('S')"><i class="fas fa-pause"></i></button>
+              <button class="arrow-btn down" onclick="send('B')"><i class="fas fa-arrow-down"></i></button>
+            </div>
+            <div class="speed-control">
+              <input type="range" min="0" max="255" value="160" class="slider-vertical" oninput="spd(this.value)" orient="vertical">
+              <input type="hidden" id="v" value="160">
+            </div>
+          </div>
+          
+        </div>
+      </div>
+      
+      <!-- Section B: Lights (Vertical Top to Bottom) -->
+      <div class="section-b">
+        <div class="column-title">Lights</div>
+        <div class="lights-vertical">
+          <!-- Basic Lights -->
+          <button class="light-btn vertical" onclick="light('F')"><i class="fas fa-lightbulb"></i> Front</button>
+          <button class="light-btn vertical" onclick="light('B')"><i class="fas fa-lightbulb"></i> Back</button>
+          <button class="light-btn vertical" onclick="light('A')"><i class="fas fa-lightbulb"></i> All</button>
+          <button class="light-btn vertical" onclick="light('O')"><i class="fas fa-moon"></i> Off</button>
+          
+          <!-- RGB Lights -->
+          <div class="rgb-separator"></div>
+          <button class="rgb-btn vertical" onclick="rgb('red')"><i class="fas fa-circle" style="color: red;"></i> Red</button>
+          <button class="rgb-btn vertical" onclick="rgb('green')"><i class="fas fa-circle" style="color: green;"></i> Green</button>
+          <button class="rgb-btn vertical" onclick="rgb('blue')"><i class="fas fa-circle" style="color: blue;"></i> Blue</button>
+          <button class="rgb-btn vertical" onclick="rgb('white')"><i class="fas fa-circle" style="color: white;"></i> White</button>
+          <button class="rgb-btn vertical" onclick="rgb('rainbow')"><i class="fas fa-rainbow"></i> Rainbow</button>
+          <button class="rgb-btn vertical" onclick="rgb('off')"><i class="fas fa-power-off"></i> Off</button>
+        </div>
+      </div>
+    </div>
+    
+    <input type="hidden" id="pos" value="C">
+  </div>
+</div>
+
+<script>
+// WebSocket connection
+let websocket = null;
+let reconnectInterval = null;
+
+// Initialize WebSocket connection
+function initWebSocket() {
+  const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+  const wsUrl = `${protocol}//${window.location.hostname}:81`;
+  
+  console.log('Connecting to WebSocket:', wsUrl);
+  
+  websocket = new WebSocket(wsUrl);
+  
+  websocket.onopen = function(event) {
+    console.log('WebSocket connected');
+    window.websocket = websocket;
+    
+    // Clear reconnect interval if exists
+    if (reconnectInterval) {
+      clearInterval(reconnectInterval);
+      reconnectInterval = null;
+    }
+    
+    // Request current status
+    requestStatus();
+  };
+  
+  websocket.onmessage = function(event) {
+    console.log('WebSocket message received:', event.data);
+    
+    try {
+      const data = JSON.parse(event.data);
+      updateUIFromStatus(data);
+    } catch (e) {
+      console.error('Error parsing WebSocket message:', e);
+    }
+  };
+  
+  websocket.onclose = function(event) {
+    console.log('WebSocket disconnected. Code:', event.code, 'Reason:', event.reason);
+    window.websocket = null;
+    
+    // Attempt to reconnect after 3 seconds
+    if (!reconnectInterval) {
+      reconnectInterval = setInterval(initWebSocket, 3000);
+    }
+  };
+  
+  websocket.onerror = function(error) {
+    console.error('WebSocket error:', error);
+  };
+}
+
+// Request current status from server
+function requestStatus() {
+  if (websocket && websocket.readyState === WebSocket.OPEN) {
+    websocket.send(JSON.stringify({type: 'getStatus'}));
+  }
+}
+
+// Update UI from status data
+function updateUIFromStatus(data) {
+  if (data.status) {
+    const statusElement = document.getElementById('status');
+    if (statusElement) {
+      statusElement.textContent = data.status;
+    }
+  }
+  
+  if (data.direction) {
+    const directionElement = document.getElementById('direction');
+    if (directionElement) {
+      directionElement.textContent = data.direction;
+    }
+  }
+  
+  if (data.speed) {
+    const speedElement = document.getElementById('speed-display');
+    if (speedElement) {
+      speedElement.textContent = data.speed;
+    }
+  }
+}
+
+// Send command via WebSocket
+function sendCommand(cmd) {
+  if (websocket && websocket.readyState === WebSocket.OPEN) {
+    websocket.send(JSON.stringify({cmd: cmd}));
+    console.log('Command sent via WebSocket:', cmd);
+  } else {
+    // Fallback to HTTP if WebSocket not available
+    fetch('/cmd?c=' + cmd);
+    console.log('Command sent via HTTP fallback:', cmd);
+  }
+  updateDirection(cmd);
+}
+
+// Send speed via WebSocket
+function sendSpeed(val) {
+  if (websocket && websocket.readyState === WebSocket.OPEN) {
+    websocket.send(JSON.stringify({speed: parseInt(val)}));
+    console.log('Speed sent via WebSocket:', val);
+  } else {
+    // Fallback to HTTP
+    fetch('/speed?v=' + val);
+    console.log('Speed sent via HTTP fallback:', val);
+  }
+}
+
+// Send steering command via WebSocket
+function sendSteering(cmd) {
+  if (websocket && websocket.readyState === WebSocket.OPEN) {
+    const steeringData = {
+      steer: cmd,
+      timestamp: Date.now()
+    };
+    websocket.send(JSON.stringify(steeringData));
+    console.log('Steering sent via WebSocket:', steeringData);
+  } else {
+    // Fallback to HTTP
+    fetch('/steer?s=' + cmd)
+      .then(response => {
+        if (response.ok) {
+          console.log('Steering sent via HTTP fallback:', cmd);
+        } else {
+          console.error('HTTP steering command failed');
+        }
+      })
+      .catch(error => {
+        console.error('HTTP steering command error:', error);
+      });
+  }
+}
+
+// Send light command via WebSocket
+function sendLight(cmd) {
+  if (websocket && websocket.readyState === WebSocket.OPEN) {
+    websocket.send(JSON.stringify({light: cmd}));
+    console.log('Light sent via WebSocket:', cmd);
+  } else {
+    // Fallback to HTTP
+    fetch('/light?c=' + cmd);
+    console.log('Light sent via HTTP fallback:', cmd);
+  }
+}
+
+// Send RGB command via WebSocket
+function sendRGB(cmd) {
+  if (websocket && websocket.readyState === WebSocket.OPEN) {
+    websocket.send(JSON.stringify({rgb: cmd}));
+    console.log('RGB sent via WebSocket:', cmd);
+  } else {
+    // Fallback to HTTP
+    fetch('/rgb?c=' + cmd);
+    console.log('RGB sent via HTTP fallback:', cmd);
+  }
+}
+
+// GSAP Draggable steering implementation with Automatic Tilt Mode
+const wheel = document.getElementById("wheel");
+
+let tiltMode = false;
+let draggableInstance = null;
+
+// Initialize draggable steering
+function initDraggableSteering() {
+  draggableInstance = Draggable.create("#wheel", {
+    type:"rotation",
+    bounds:{minRotation:-120, maxRotation:120},
+
+    onDrag:function(){
+      // Allow override even in tilt mode when dragging is forced
+      let angle = this.rotation;
+      let steering = Math.round(angle/120*100);
+      
+      // Convert angle to simple L/R/C command
+      let steerCmd;
+      if (angle < -20) {
+        steerCmd = "L";
+      } else if (angle > 20) {
+        steerCmd = "R";
+      } else {
+        steerCmd = "C";
+      }
+      
+      sendSteering(steerCmd);
+      console.log("Angle:", angle.toFixed(1), "Command:", steerCmd);
+    },
+
+    onDragEnd:function(){
+      // Allow override even in tilt mode when dragging is forced
+      
+      // Auto-center on release
+      TweenMax.to(this.target, 0.3, {
+        rotation:0,
+        duration:0.4,
+        onUpdate:function() {
+          sendSteering("C");
+        },
+        onComplete:function() {
+          console.log("Steering centered");
+        }
+      });
+    }
+  });
+}
+
+// Check for tilt capability and auto-enable
+function checkTiltCapability() {
+  console.log("Checking tilt capability...");
+  
+  // Check if device orientation is available
+  if (typeof DeviceOrientationEvent !== 'undefined') {
+    console.log("Device orientation API is available");
+    
+    // Check if it's a mobile device (touch capability)
+    const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    console.log("Is mobile device:", isMobile);
+    
+    if (isMobile) {
+      console.log("Mobile device detected - enabling tilt mode automatically");
+      enableTiltMode();
+    } else {
+      console.log("Desktop device detected - using drag mode");
+      // Keep drag mode for desktop
+    }
+  } else {
+    console.log("Device orientation not supported - using drag mode");
+    // Keep drag mode if no orientation support
+  }
+}
+
+// Enable tilt mode automatically
+function enableTiltMode() {
+  console.log("Enabling tilt mode...");
+  
+  // Disable draggable
+  if (draggableInstance && draggableInstance[0]) {
+    draggableInstance[0].disable();
+    console.log("Draggable disabled");
+  }
+  
+  tiltMode = true;
+  console.log("Tilt mode set to true");
+  
+  // Request device orientation permission for iOS
+  if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+    console.log("Requesting iOS permission...");
+    DeviceOrientationEvent.requestPermission()
+      .then(response => {
+        if (response === 'granted') {
+          window.addEventListener('deviceorientation', handleOrientation);
+          console.log("Tilt mode enabled with iOS permission");
+        } else {
+          console.log("iOS permission denied - falling back to drag mode");
+          // Fallback to drag mode if permission denied
+          disableTiltMode();
+        }
+      })
+      .catch(error => {
+        console.error("Error requesting iOS permission:", error);
+        // Fallback to drag mode on error
+        disableTiltMode();
+      });
+  } else {
+    // Non-iOS devices or older browsers
+    window.addEventListener('deviceorientation', handleOrientation);
+    console.log("Tilt mode enabled for non-iOS device");
+  }
+}
+
+// Disable tilt mode (fallback)
+function disableTiltMode() {
+  // Enable draggable
+  if (draggableInstance && draggableInstance[0]) {
+    draggableInstance[0].enable();
+  }
+  
+  tiltMode = false;
+  
+  // Remove tilt listener
+  window.removeEventListener('deviceorientation', handleOrientation);
+  
+  // Center steering
+  sendSteering("C");
+  console.log("Drag mode enabled (fallback)");
+}
+
+// Handle device orientation for tilt steering
+function handleOrientation(event) {
+  if (!tiltMode) return;
+  
+  // Use gamma for left-right tilt (-90 to 90)
+  let tilt = event.gamma;
+  
+  if (tilt === null) return;
+  
+  // Increase tilt sensitivity: Clamp to -60 to 60 degrees for better turning
+  tilt = Math.max(-60, Math.min(60, tilt));
+  
+  // Update wheel rotation visually
+  const displayAngle = (tilt / 60) * 120; // Map to -120 to 120 for display
+  wheel.style.transform = `rotate(${displayAngle}deg)`;
+  
+  // Convert tilt to simple L/R/C command
+  let steerCmd;
+  if (tilt < -20) {
+    steerCmd = "L";
+  } else if (tilt > 20) {
+    steerCmd = "R";
+  } else {
+    steerCmd = "C";
+  }
+  
+  // Only send command if it's different from the last one
+  if (handleOrientation.lastSteerCmd !== steerCmd) {
+    sendSteering(steerCmd);
+    console.log("Tilt:", tilt.toFixed(1), "Angle:", displayAngle.toFixed(1), "Command:", steerCmd);
+    handleOrientation.lastSteerCmd = steerCmd;
+  }
+}
+
+// Manual toggle for tilt mode
+function toggleTiltMode() {
+  const toggleBtn = document.getElementById('tiltToggle');
+  
+  if (tiltMode) {
+    // Disable tilt mode
+    disableTiltMode();
+    toggleBtn.textContent = 'Enable Tilt Mode';
+    toggleBtn.style.background = '#4CAF50';
+    console.log("Tilt mode manually disabled");
+  } else {
+    // Enable tilt mode
+    enableTiltMode();
+    toggleBtn.textContent = 'Disable Tilt Mode';
+    toggleBtn.style.background = '#f44336';
+    console.log("Tilt mode manually enabled");
+  }
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+  initWebSocket();
+  initDraggableSteering();
+  checkTiltCapability(); // Auto-detect and enable tilt mode
+});
+
+// Movement control function (updated to use WebSocket)
+function send(cmd) {
+  console.log('Movement command: ' + cmd);
+  
+  // Update UI immediately for better responsiveness
+  updateDirection(cmd);
+  
+  // Send command via WebSocket
+  if (websocket && websocket.readyState === WebSocket.OPEN) {
+    const commandData = {
+      cmd: cmd,
+      timestamp: Date.now()
+    };
+    websocket.send(JSON.stringify(commandData));
+    console.log('Command sent via WebSocket:', commandData);
+  } else {
+    // Fallback to HTTP if WebSocket not available
+    fetch('/cmd?c=' + cmd)
+      .then(response => {
+        if (response.ok) {
+          console.log('Command sent via HTTP fallback:', cmd);
+        } else {
+          console.error('HTTP command failed:', cmd);
+        }
+      })
+      .catch(error => {
+        console.error('HTTP command error:', error);
+      });
+  }
+  
+  // Update local status immediately
+  updateStatus(cmd);
+}
+
+function updateDirection(cmd) {
+  const directionElement = document.getElementById('direction');
+  switch(cmd) {
+    case 'F':
+      directionElement.textContent = '🚗 Moving';
+      directionElement.className = 'text-green-400';
+      break;
+    case 'B':
+      directionElement.textContent = '🚗 Moving';
+      directionElement.className = 'text-green-400';
+      break;
+    case 'S':
+      directionElement.textContent = '🛑 Stopped';
+      directionElement.className = 'text-yellow-400';
+      break;
+    default:
+      directionElement.textContent = '🛑 Stopped';
+      directionElement.className = 'text-yellow-400';
+  }
+}
+
+function spd(val) {
+  document.getElementById('v').textContent = val;
+  document.getElementById('speed-display').textContent = val + ' km/h';
+  
+  // Send speed via WebSocket
+  if (websocket && websocket.readyState === WebSocket.OPEN) {
+    const speedData = {
+      speed: parseInt(val),
+      timestamp: Date.now()
+    };
+    websocket.send(JSON.stringify(speedData));
+    console.log('Speed sent via WebSocket:', speedData);
+  } else {
+    // Fallback to HTTP
+    fetch('/speed?v=' + val)
+      .then(response => {
+        if (response.ok) {
+          console.log('Speed sent via HTTP fallback:', val);
+        } else {
+          console.error('HTTP speed command failed');
+        }
+      })
+      .catch(error => {
+        console.error('HTTP speed command error:', error);
+      });
+  }
+}
+
+function light(cmd) {
+  // Send light command via WebSocket
+  if (websocket && websocket.readyState === WebSocket.OPEN) {
+    const lightData = {
+      light: cmd,
+      timestamp: Date.now()
+    };
+    websocket.send(JSON.stringify(lightData));
+    console.log('Light command sent via WebSocket:', lightData);
+  } else {
+    // Fallback to HTTP
+    fetch('/light?c=' + cmd)
+      .then(response => {
+        if (response.ok) {
+          console.log('Light command sent via HTTP fallback:', cmd);
+        } else {
+          console.error('HTTP light command failed');
+        }
+      })
+      .catch(error => {
+        console.error('HTTP light command error:', error);
+      });
+  }
+}
+
+function rgb(color) {
+  // Send RGB command via WebSocket
+  if (websocket && websocket.readyState === WebSocket.OPEN) {
+    const rgbData = {
+      rgb: color,
+      timestamp: Date.now()
+    };
+    websocket.send(JSON.stringify(rgbData));
+    console.log('RGB command sent via WebSocket:', rgbData);
+  } else {
+    // Fallback to HTTP
+    fetch('/rgb?c=' + color)
+      .then(response => {
+        if (response.ok) {
+          console.log('RGB command sent via HTTP fallback:', color);
+        } else {
+          console.error('HTTP RGB command failed');
+        }
+      })
+      .catch(error => {
+        console.error('HTTP RGB command error:', error);
+      });
+  }
+}
+
+function updateStatus(cmd) {
+  const statusElement = document.getElementById('status');
+  const directionElement = document.getElementById('direction');
+  const speedElement = document.getElementById('speed-display');
+  
+  let statusText = '';
+  let statusClass = 'text-blue-400';
+  let directionText = '';
+  let directionClass = 'text-yellow-400';
+  
+  switch(cmd) {
+    case 'F':
+      statusText = '🚗 Moving Forward';
+      statusClass = 'text-green-400';
+      directionText = '🚗 Moving';
+      directionClass = 'text-green-400';
+      break;
+    case 'B':
+      statusText = '🚗 Moving Backward';
+      statusClass = 'text-green-400';
+      directionText = '🚗 Moving';
+      directionClass = 'text-green-400';
+      break;
+    case 'S':
+      statusText = '⏸️ Paused';
+      statusClass = 'text-yellow-400';
+      directionText = '🛑 Stopped';
+      directionClass = 'text-yellow-400';
+      break;
+    default:
+      statusText = '🛑 Ready';
+      statusClass = 'text-blue-400';
+      directionText = '🛑 Stopped';
+      directionClass = 'text-yellow-400';
+  }
+  
+  // Update all status elements
+  if (statusElement) {
+    statusElement.textContent = statusText;
+    statusElement.className = statusClass;
+  }
+  
+  if (directionElement) {
+    directionElement.textContent = directionText;
+    directionElement.className = directionClass;
+  }
+  
+  // Get current speed value
+  const currentSpeed = document.getElementById('v').textContent;
+  if (speedElement && currentSpeed) {
+    speedElement.textContent = currentSpeed + ' km/h';
+  }
+  
+  // Send all status in single WebSocket request
+  sendStatusWebSocket(statusText, directionText, currentSpeed);
+}
+
+// WebSocket function to send all status in single request
+function sendStatusWebSocket(status, direction, speed) {
+  // Create combined status data
+  const statusData = {
+    status: status,
+    direction: direction,
+    speed: speed,
+    timestamp: Date.now()
+  };
+  
+  // Send as single WebSocket message
+  if (websocket && websocket.readyState === WebSocket.OPEN) {
+    websocket.send(JSON.stringify(statusData));
+  }
+  
+  console.log('Status sent:', statusData);
+}
+</script>
+</body>
+</html>
