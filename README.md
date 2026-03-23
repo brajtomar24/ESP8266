@@ -5,16 +5,16 @@ Convert a normal RC car into a smart WiFi-controlled car using ESP8266 and DRV88
 ---
 
 ## 🎬 Project Demo
-📺 Watch full video: [https://www.youtube.com/@evidyas](https://youtu.be/K38xlUVRHNg)
+📺 YouTube Video: [https://www.youtube.com/@evidyas](https://youtu.be/K38xlUVRHNg)
 
 ---
 
 ## 🔥 Features
-- Control car using mobile browser (No app required)
+- Control car using mobile browser (No app needed)
 - Forward, Reverse, Left, Right control
-- Real-time response over WiFi
-- Beginner-friendly project
-- Low-cost and easy to build
+- Real-time WiFi communication
+- Easy to build for beginners
+- Low-cost IoT project
 
 ---
 
@@ -28,20 +28,25 @@ Convert a normal RC car into a smart WiFi-controlled car using ESP8266 and DRV88
 
 ---
 
+## 🖼️ Project Preview
+![Smart Car](add-your-image-link-here)
+
+---
+
 ## 🔌 Circuit Diagram
-📷 Add your circuit diagram image here
+![Circuit Diagram](add-your-circuit-image-link-here)
 
 ---
 
 ## 💻 Code
-Upload the `.ino` file to ESP8266 using Arduino IDE.
+Upload the `platformio.ino` file to ESP8266 using VSCode or Windsurf IDE.
 
 ---
 
 ## 🚀 How to Use
 1. Upload code to ESP8266  
-2. Power the circuit  
-3. Connect your mobile to ESP8266 WiFi  
+2. Power the system  
+3. Connect mobile to ESP8266 WiFi  
 4. Open browser and enter IP address  
 5. Control your smart car  
 
@@ -54,6 +59,7 @@ https://evidyas.com
 
 ## 💬 Support
 If you like this project:
+
 ⭐ Star this repository  
 👍 Like the video  
 🔔 Subscribe to the channel  
@@ -64,12 +70,12 @@ If you like this project:
 - Steering using Servo Motor  
 - Obstacle Avoidance using Ultrasonic Sensor  
 - Mobile App Control  
-- Voice Control Integration  
+- Voice Control  
 
 ---
 
 ## 📺 YouTube Channel
-[https://www.youtube.com/@evidyas](https://youtu.be/K38xlUVRHNg)
+https://www.youtube.com/@evidyas
 
 ---
 
